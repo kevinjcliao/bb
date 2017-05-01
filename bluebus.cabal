@@ -24,4 +24,4 @@ executable bluebus
                      , time >= 1.6
                      , split
                      , MissingH
-                       
+                     , argparser

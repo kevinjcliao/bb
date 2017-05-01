@@ -15,10 +15,21 @@ import Data.String.Utils
 
 data AmOrPm = AM | PM deriving Show
 
+-- Differentiating between a stop at Haverford vs. a stop at Bryn Mawr
+data Haverford  = Haverford Day TimeOfDay deriving Show
 
+data BrynMawr   = BrynMawr Day TimeOfDay deriving Show
+
+data Swarthmore = Swarthmore Day TimeOfDay deriving Show
+
+data BlueBus = HcToBmc Haverford BrynMawr | BmcToHc BrynMawr Haverford deriving Show
 
 -- We don't support weekend blue bus schedule yet.
 data Day = Monday | Tuesday | Wednesday | Thursday | Friday deriving Show
+
+tupleToBus :: [(Day, TimeOfDay)] -> (BlueBus, BlueBus)
+tupleToBus ((d1, t1) : (d2, t2) : (d3, t3) : (d4, t4) : []) =
+  ((HcToBmc (Haverford d1 t1) (BrynMawr d2 t2)), (BmcToHc (BrynMawr d3 t3) (Haverford d4 t4)))
 
 strToDay :: String -> Maybe Day
 strToDay str = case toUpperCase str of
@@ -36,12 +47,8 @@ succDay Wednesday = Thursday
 succDay Thursday = Friday
 succDay Friday = Monday
 
-removeNothings :: [Maybe (Day, TimeOfDay)] -> [(Day, TimeOfDay)]
-removeNothings [] = []
-removeNothings (Just a : xs) = (a : removeNothings xs)
-removeNothings (Nothing : xs) = removeNothings xs
 
-parseTable :: TagTree String -> [(Day, TimeOfDay)]
+parseTable :: TagTree String -> [[(Day, TimeOfDay)]]
 parseTable (TagBranch "table" _ children) =
   case maybeDay of
     Just day -> concatMap (parseBody day) children
@@ -49,8 +56,8 @@ parseTable (TagBranch "table" _ children) =
     where
       maybeDay = strToDay $ getDay (head $ tail children)
 
-parseBody :: Day -> TagTree String -> [(Day, TimeOfDay)]
-parseBody day tag@(TagBranch "tbody" _ children) = concatMap (parseRow day) children
+parseBody :: Day -> TagTree String -> [[(Day, TimeOfDay)]]
+parseBody day tag@(TagBranch "tbody" _ children) = removeEmptyLists'' $ map (parseRow day) children
 parseBody day (TagBranch _ _ children)           = concatMap (parseBody day) children
 parseBody _   (TagLeaf _)                        = []
 
@@ -59,7 +66,6 @@ getDay :: TagTree String -> String
 getDay (TagBranch "h3" _ [(TagLeaf (TagText day))]) = removeSpaces day
 getDay (TagBranch _ _ children)                     = concatMap getDay children
 getDay _                                            = ""
-
 
 parseRow :: Day -> TagTree String -> [(Day, TimeOfDay)]
 parseRow day (TagBranch "tr" _ children)                                              =
@@ -82,11 +88,19 @@ toDateTime str day = (day, TimeOfDay hours minutes 0) where
 
 
 getHours :: String -> Int
-getHours str = (+ pmModifier) (read $ head $ splitOn ":" $ removeSpaces str :: Int) where
+getHours str = toHours hoursInt amOrPm where
+  hoursInt = read $ head $ splitOn ":" $ removeSpaces str :: Int
   amOrPm = getAmOrPm str
-  pmModifier = case amOrPm of
-    AM -> 0
-    PM -> 12
+
+toHours :: Int -> AmOrPm -> Int
+-- toHours 12 AM     = 0
+toHours 0  AM     = 0
+toHours 12 PM     = 12
+toHours h  amOrPm = case amOrPm of
+  AM -> h
+  PM -> h + 12
+
+
 
 getMinutes :: String -> Int
 getMinutes str = read $ head $ tail $ splitOn ":" $ removeAmOrPm $ removeSpaces str :: Int
@@ -123,8 +137,12 @@ getTags (TagLeaf   _)     = "This is a tagleaf."
 removeSpaces :: String -> String
 removeSpaces str = head $ splitOn "&" $ filter (/=' ') $ replace "\160" "" str
 
-removeEmptyLists :: [[TagTree String]] -> [[TagTree String]]
-removeEmptyLists = filter (not . null)
+-- removeEmptyTuples :: [(Day, TimeOfDay)] -> [(Day, TimeOfDay)]0-;
+removeEmptyLists'' :: [[(Day, TimeOfDay)]] -> [[(Day, TimeOfDay)]]
+removeEmptyLists'' = filter (not . null)
+
+removeEmptyLists' :: [[TagTree String]] -> [[TagTree String]]
+removeEmptyLists' = filter (not . null)
 
 toUpperCase :: String -> String
 toUpperCase = map toUpper
