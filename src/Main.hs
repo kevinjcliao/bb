@@ -36,7 +36,7 @@ bb = do
   --           Remove empty lists.   create a list of all the tables.
   let tables = head $ removeEmptyLists' $ map getTables tree
   let parsedTables = concatMap parseTable tables
-  let (hcToBmcBuses, bmcToHcBuses) = unzip $ map tupleToBus parsedTables -- (One list of HC to BMC, One List of BMC to HC)
+  let (bmcToHcBuses, hcToBmcBuses) = unzip $ map tupleToBus parsedTables -- (One list of HC to BMC, One List of BMC to HC)
 
   -- Let's start dealing with time here.
   currentTimeUtc   <- getCurrentTime
