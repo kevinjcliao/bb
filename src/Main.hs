@@ -113,8 +113,6 @@ bbParser :: ParserSpec BbArgs
 bbParser = BbArgs
   `parsedBy` reqPos "pos1"
 
-ghciMain :: IO ()
-ghciMain = bb
 
 main :: IO ()
 main = bb
