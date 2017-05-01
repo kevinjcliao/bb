@@ -11,8 +11,6 @@ import Text.HTML.TagSoup
 import Text.HTML.TagSoup.Tree
 import Parse
 
--- We don't support weekend blue bus schedule yet.
-data Day = Monday | Tuesday | Wednesday | Thursday | Friday
 
 -- Differentiating between a stop at Haverford vs. a stop at Bryn Mawr
 data Haverford  = Haverford TimeOfDay

@@ -22,4 +22,6 @@ executable bluebus
                      , hxt
                      , HTTP
                      , time >= 1.6
+                     , split
+                     , MissingH
                        
