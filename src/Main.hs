@@ -36,8 +36,8 @@ blueBus = do
   let tree = parseTree src
   --           Remove empty lists.   create a list of all the tables.
   let tables = head $ removeEmptyLists $ map getTables tree
-  let tablesAsString = map parseTable tables
-  print tablesAsString
+  let parsedTables = concatMap parseTable tables
+  print parsedTables
 
 
 
