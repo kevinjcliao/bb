@@ -25,7 +25,7 @@ data Swarthmore = Swarthmore Day TimeOfDay deriving Show
 data BlueBus = HcToBmc Haverford BrynMawr | BmcToHc BrynMawr Haverford deriving Show
 
 -- We don't support weekend blue bus schedule yet.
-data Day = Monday | Tuesday | Wednesday | Thursday | Friday deriving Show
+data Day = Monday | Tuesday | Wednesday | Thursday | Friday deriving (Show, Eq, Ord)
 
 tupleToBus :: [(Day, TimeOfDay)] -> (BlueBus, BlueBus)
 tupleToBus ((d1, t1) : (d2, t2) : (d3, t3) : (d4, t4) : []) =
