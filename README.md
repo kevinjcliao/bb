@@ -3,9 +3,9 @@
 bb is a utility written in Haskell that grabs data from the Bryn Mawr website and scrapes it for Blue Bus times. It then finds you the next blue bus departing from your current school. Currently only supports weekday Blue Bus Schedules, and Haverford or Bryn Mawr colleges. No TriCo van yet, sorry. 
 ## Install: 
 Clone this directory and then run: 
-> stack setup
-> stack install
-> stack build
+> stack setup  
+> stack install  
+> stack build  
 > stack exec bluebus
 
 ## Code Structure: 
